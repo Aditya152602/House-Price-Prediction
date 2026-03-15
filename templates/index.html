@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>House · Price · Prediction</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+
+<!-- ── Cursor trail ── -->
+<div id="cursor-glow"></div>
+
+<!-- ── Particles background ── -->
+<div id="particles"></div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">⌂</span>
+      <div>
+        <span class="logo-text">House · Price · Prediction</span>
+        <span class="logo-sub">AI-Powered Real Estate Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-btn active" data-tab="predictor">🏠 Predictor</button>
+      <button class="nav-btn" data-tab="compare">⚖️ Compare</button>
+      <button class="nav-btn" data-tab="emi">💳 EMI Calc</button>
+      <button class="nav-btn" data-tab="market">📈 Market</button>
+    </nav>
+    <div class="header-badge">
+      <span class="live-dot"></span> Live AI Engine
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-text">
+    <h1 class="hero-title">Know Your<br><em>Property's</em><br>True Worth</h1>
+    <p class="hero-desc">Advanced ML model trained on Indian real estate data across 15+ cities — delivering precise valuations in milliseconds.</p>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><span class="hstat-num" data-target="97">0</span><span>%</span><span class="hstat-label">Accuracy</span></div>
+    <div class="hstat"><span class="hstat-num" data-target="15">0</span><span>+</span><span class="hstat-label">Cities</span></div>
+    <div class="hstat"><span class="hstat-num" data-target="50">0</span><span>K+</span><span class="hstat-label">Predictions</span></div>
+    <div class="hstat"><span class="hstat-num" data-target="8">0</span><span></span><span class="hstat-label">Property Types</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: PREDICTOR -->
+<!-- ══════════════════════════════════════════════════════ -->
+<main>
+<section class="tab-section active" id="tab-predictor">
+  <div class="form-result-grid">
+
+    <!-- FORM PANEL -->
+    <div class="glass-card form-card">
+      <div class="card-header">
+        <h2>Property Details</h2>
+        <button class="btn-reset" id="resetBtn">↺ Reset</button>
+      </div>
+
+      <!-- Basic Info -->
+      <div class="form-section-label">📐 Basic Information</div>
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Area (sq ft) <span class="req">*</span></label>
+          <div class="slider-wrap">
+            <input type="range" id="area_sqft" min="200" max="10000" value="1500" step="50"/>
+            <output id="area_val">1500 sqft</output>
+          </div>
+        </div>
+        <div class="field">
+          <label>City / Location</label>
+          <select id="city">
+            {% for c in cities %}
+            <option value="{{ c }}" {% if c == 'Lakhimpur' %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-3">
+        <div class="field">
+          <label>Bedrooms</label>
+          <div class="counter-wrap">
+            <button class="counter-btn" data-target="bedrooms" data-dir="-1">−</button>
+            <span id="bedrooms" class="counter-val">3</span>
+            <button class="counter-btn" data-target="bedrooms" data-dir="1">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Bathrooms</label>
+          <div class="counter-wrap">
+            <button class="counter-btn" data-target="bathrooms" data-dir="-1">−</button>
+            <span id="bathrooms" class="counter-val">2</span>
+            <button class="counter-btn" data-target="bathrooms" data-dir="1">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Floors</label>
+          <div class="counter-wrap">
+            <button class="counter-btn" data-target="floors" data-dir="-1">−</button>
+            <span id="floors" class="counter-val">2</span>
+            <button class="counter-btn" data-target="floors" data-dir="1">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property Info -->
+      <div class="form-section-label">🏗️ Property Info</div>
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Property Type</label>
+          <select id="property_type">
+            {% for t in prop_types %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Condition</label>
+          <select id="condition">
+            {% for c in conditions %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Age of Property: <span id="age_val" style="color:var(--accent)">5 years</span></label>
+        <input type="range" id="age_years" min="0" max="50" value="5"/>
+      </div>
+
+      <!-- Amenities -->
+      <div class="form-section-label">✨ Amenities & Features</div>
+      <div class="amenities-grid">
+        <label class="amenity-chip"><input type="checkbox" id="garage" checked/><span>🚗 Garage</span></label>
+        <label class="amenity-chip"><input type="checkbox" id="pool"/><span>🏊 Pool</span></label>
+        <label class="amenity-chip"><input type="checkbox" id="garden" checked/><span>🌿 Garden</span></label>
+        <label class="amenity-chip"><input type="checkbox" id="furnished"/><span>🛋️ Furnished</span></label>
+        <label class="amenity-chip"><input type="checkbox" id="solar"/><span>☀️ Solar</span></label>
+        <label class="amenity-chip"><input type="checkbox" id="security" checked/><span>🔒 Security</span></label>
+        <label class="amenity-chip"><input type="checkbox" id="gym"/><span>💪 Gym</span></label>
+      </div>
+
+      <button class="predict-btn" id="predictBtn">
+        <span class="btn-text">⚡ Predict Price</span>
+        <span class="btn-loader" hidden>Analyzing…</span>
+      </button>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div class="result-panel" id="resultPanel">
+      <div class="result-placeholder" id="resultPlaceholder">
+        <div class="placeholder-icon">🏡</div>
+        <p>Fill in property details and click <strong>Predict Price</strong> to get an instant AI-powered valuation.</p>
+      </div>
+
+      <div class="result-content" id="resultContent" hidden>
+        <!-- Price Card -->
+        <div class="price-card glass-card">
+          <div class="price-label">Estimated Market Value</div>
+          <div class="price-main" id="priceMain">₹0</div>
+          <div class="price-range">
+            <span id="priceLow">₹0</span> — <span id="priceHigh">₹0</span>
+          </div>
+          <div class="price-psf">₹<span id="pricePerSqft">0</span> per sq ft</div>
+        </div>
+
+        <!-- Metrics row -->
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-label">Confidence</div>
+            <div class="metric-val" id="confVal">0%</div>
+            <div class="conf-bar"><div class="conf-fill" id="confFill"></div></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Investment Score</div>
+            <div class="metric-val" id="invScore">0/100</div>
+            <div class="score-ring-wrap"><canvas id="scoreRing" width="60" height="60"></canvas></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Rental Yield</div>
+            <div class="metric-val" id="rentalYield">0%</div>
+            <div class="metric-sub">Annual estimate</div>
+          </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="glass-card breakdown-card">
+          <h3>💡 Price Breakdown</h3>
+          <div id="breakdownBars"></div>
+        </div>
+
+        <!-- Trend Chart -->
+        <div class="glass-card chart-card">
+          <h3>📈 12-Month Market Trend — <span id="chartCity">-</span></h3>
+          <canvas id="trendChart" height="140"></canvas>
+        </div>
+
+        <!-- Neighborhood Stats -->
+        <div class="glass-card neighborhood-card">
+          <h3>🏘️ Neighborhood Insights</h3>
+          <div class="nbh-grid" id="nbhGrid"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: COMPARE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="tab-section" id="tab-compare">
+  <div class="compare-intro glass-card">
+    <h2>⚖️ Property Comparison Tool</h2>
+    <p>Compare two properties side-by-side to make the smarter investment decision.</p>
+  </div>
+  <div class="compare-grid">
+    <!-- Property 1 -->
+    <div class="glass-card compare-form">
+      <div class="compare-badge" style="background:var(--accent)">Property A</div>
+      <div class="field"><label>Area (sqft)</label><input type="number" id="c1_area" value="1200" class="text-input"/></div>
+      <div class="field"><label>City</label>
+        <select id="c1_city">
+          {% for c in cities %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label>Bedrooms</label><input type="number" id="c1_beds" value="2" class="text-input"/></div>
+      <div class="field"><label>Bathrooms</label><input type="number" id="c1_baths" value="1" class="text-input"/></div>
+      <div class="field"><label>Age (years)</label><input type="number" id="c1_age" value="3" class="text-input"/></div>
+      <div class="field"><label>Type</label>
+        <select id="c1_type">
+          {% for t in prop_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- VS -->
+    <div class="vs-col"><div class="vs-badge">VS</div></div>
+
+    <!-- Property 2 -->
+    <div class="glass-card compare-form">
+      <div class="compare-badge" style="background:var(--accent2)">Property B</div>
+      <div class="field"><label>Area (sqft)</label><input type="number" id="c2_area" value="1800" class="text-input"/></div>
+      <div class="field"><label>City</label>
+        <select id="c2_city">
+          {% for c in cities %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field"><label>Bedrooms</label><input type="number" id="c2_beds" value="3" class="text-input"/></div>
+      <div class="field"><label>Bathrooms</label><input type="number" id="c2_baths" value="2" class="text-input"/></div>
+      <div class="field"><label>Age (years)</label><input type="number" id="c2_age" value="8" class="text-input"/></div>
+      <div class="field"><label>Type</label>
+        <select id="c2_type">
+          {% for t in prop_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+  <button class="predict-btn" id="compareBtn">⚖️ Compare Properties</button>
+  <div id="compareResult" hidden>
+    <div class="compare-result-grid glass-card">
+      <div class="cr-col" id="cr1"></div>
+      <div class="cr-divider"></div>
+      <div class="cr-col" id="cr2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: EMI -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="tab-section" id="tab-emi">
+  <div class="emi-layout">
+    <div class="glass-card emi-form">
+      <h2>💳 Home Loan EMI Calculator</h2>
+      <div class="field">
+        <label>Property Price (₹)</label>
+        <input type="number" id="emi_price" value="5000000" class="text-input"/>
+      </div>
+      <div class="field">
+        <label>Down Payment: <span id="dp_val" style="color:var(--accent)">20%</span></label>
+        <input type="range" id="down_payment_pct" min="5" max="50" value="20"/>
+      </div>
+      <div class="field">
+        <label>Interest Rate (p.a.): <span id="ir_val" style="color:var(--accent)">8.5%</span></label>
+        <input type="range" id="interest_rate" min="5" max="20" step="0.1" value="8.5"/>
+      </div>
+      <div class="field">
+        <label>Loan Tenure: <span id="ten_val" style="color:var(--accent)">20 years</span></label>
+        <input type="range" id="tenure_years" min="1" max="30" value="20"/>
+      </div>
+      <button class="predict-btn" id="emiBtn">Calculate EMI</button>
+    </div>
+    <div class="glass-card emi-result" id="emiResult" hidden>
+      <div class="emi-big">₹<span id="emiAmount">0</span><span class="emi-mo">/month</span></div>
+      <div class="emi-breakdown-grid">
+        <div class="emi-item"><span class="emi-item-label">Loan Amount</span><span class="emi-item-val" id="loanAmt">₹0</span></div>
+        <div class="emi-item"><span class="emi-item-label">Down Payment</span><span class="emi-item-val" id="downAmt">₹0</span></div>
+        <div class="emi-item"><span class="emi-item-label">Total Payment</span><span class="emi-item-val" id="totalPay">₹0</span></div>
+        <div class="emi-item"><span class="emi-item-label">Total Interest</span><span class="emi-item-val" id="totalInt">₹0</span></div>
+      </div>
+      <canvas id="emiPieChart" width="220" height="220"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: MARKET -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="tab-section" id="tab-market">
+  <div class="market-header glass-card">
+    <h2>📈 Real Estate Market Dashboard</h2>
+    <select id="marketCity" class="text-input" style="width:200px">
+      {% for c in cities %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+    </select>
+    <button class="predict-btn" id="marketBtn" style="width:auto;padding:10px 24px">Load Data</button>
+  </div>
+  <div class="market-grid">
+    <div class="glass-card market-chart-card">
+      <h3>Property Price Index (12 Months)</h3>
+      <canvas id="marketTrendChart" height="160"></canvas>
+    </div>
+    <div class="glass-card market-stats-card">
+      <h3>City Stats</h3>
+      <div id="marketStats"></div>
+    </div>
+  </div>
+  <div class="glass-card city-comparison-card">
+    <h3>🌆 Top Cities — Avg Price/sqft</h3>
+    <div id="cityBars"></div>
+  </div>
+</section>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">⌂ House · Price · Prediction</span>
+      <p>AI-powered real estate intelligence for smarter property decisions across India.</p>
+    </div>
+    <div class="footer-developer">
+      <div class="dev-card">
+        <div class="dev-avatar">👨‍💻</div>
+        <div>
+          <div class="dev-name">Developed by</div>
+          <div class="dev-realname">Aditya Dwivedi</div>
+          <div class="dev-role">Full Stack Developer · AI/ML Engineer</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-tech">
+      <div class="tech-label">Built With</div>
+      <div class="tech-chips">
+        <span>🐍 Python</span>
+        <span>⚗️ Flask</span>
+        <span>🧠 ML Model</span>
+        <span>📊 Chart.js</span>
+        <span>🎨 CSS3</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 House · Price · Prediction · All rights reserved</span>
+    <span>Designed & Developed with ❤️ by <strong>Aditya Dwivedi</strong></span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
