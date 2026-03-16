@@ -4,7 +4,6 @@ Developer: Aditya Dwivedi
 """
 
 from flask import Flask, render_template, request, jsonify
-import numpy as np
 import json
 import math
 
